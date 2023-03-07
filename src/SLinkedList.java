@@ -1,5 +1,7 @@
 import Interface_form.List;
 
+import java.util.NoSuchElementException;
+
 public class SLinkedList<E> implements List<E> {
 
     private Node<E> head;    // head : 노드의 첫 부분을 나타내는 Node<E> 타입의 변수
@@ -93,5 +95,126 @@ public class SLinkedList<E> implements List<E> {
         newNode.next = next_Node; // 새로운 노드를 다음 노드와 연결
         size++; // 리스트 크기(size)를 1 증가
 
+    }
+
+    public E remove() {
+
+        Node<E> headNode = head; // headNode 변수에 head 노드를 할당
+
+        if (headNode == null) // headNode가 null인 경우 NoSuchElementException 예외를 throw
+            throw new NoSuchElementException();
+
+        // element 변수에 headNode의 데이터를 할당
+        E element = headNode.data;
+
+        // nextNode 변수에 headNode의 다음 노드를 할당
+        Node<E> nextNode = head.next;
+
+        // headNode의 데이터와 다음 노드를 null로 설정
+        head.data = null;
+        head.next = null;
+
+        // head 변수에 nextNode를 할당
+        head = nextNode;
+        size--; // 리스트 크기를 1 감소
+
+        // 리스트 크기가 0인 경우 tail 노드를 null로 설정
+        if (size == 0) {
+            tail = null;
+        }
+        return element; // 삭제된 노드의 데이터를 반환
+    }
+
+    @Override
+    public E remove(int index) {
+
+        // 삭제하려는 노드가 첫 번째 노드인 경우 remove() 메소드를 호출하여 첫 번째 노드를 삭제
+        if (index == 0) {
+            return remove();
+        }
+
+        // 인덱스가 연결 리스트의 범위를 벗어나는 경우 IndexOutOfBoundsException 예외를 발생
+        if (index >= size || index < 0) {
+            throw new IndexOutOfBoundsException();
+        }
+
+        Node<E> prevNode = search(index - 1);    // 삭제할 노드의 이전 노드(prevNode)
+        Node<E> removedNode = prevNode.next;    // 삭제할 노드(removedNode)
+        Node<E> nextNode = removedNode.next;    // 삭제할 노드의 다음 노드(nextNode)
+
+        E element = removedNode.data;    // 삭제할 노드의 데이터(element)를 저장
+
+        // 이전 노드의 next 레퍼런스를 삭제할 노드의 다음 노드로 변경
+        prevNode.next = nextNode;
+
+        // 만약 삭제된 노드가 마지막 노드인 경우 tail을 이전 노드로 변경
+        if (prevNode.next == null) {
+            tail = prevNode;
+        }
+        // 삭제된 노드의 next 레퍼런스와 데이터를 null로 변경하여 메모리 누수를 방지하고, 크기(size)를 감소
+        removedNode.next = null;
+        removedNode.data = null;
+        size--;
+
+        return element; // 삭제된 노드의 데이터를 반환
+    }
+
+    @Override
+    public boolean remove(Object value) {
+
+        Node<E> prevNode = head; // head 노드를 prevNode에 할당
+        boolean hasValue = false; // hasValue 변수를 false로 초기화
+        Node<E> x = head;    // x 노드를 head에 할당합니다. x는 나중에 제거될 노드
+
+        // x를 리스트를 따라 이동하면서 value와 같은 값을 가진 노드를 찾습니다.
+        // 값을 찾으면 hasValue를 true로 설정하고 반복문을 중단
+        for (; x != null; x = x.next) {
+            if (value.equals(x.data)) {
+                hasValue = true;
+                break;
+            }
+            prevNode = x;
+        }
+
+        // x가 null이면, value와 일치하는 노드가 없다는 것을 의미하므로 false를 반환
+        if (x == null) {
+            return false;
+        }
+
+        // x가 head와 같으면, remove() 메소드를 호출하여 head 노드를 제거하고 true를 반환
+        if (x.equals(head)) {
+            remove();
+            return true;
+        } else {
+            // 이전 노드(prevNode)의 next를 x의 next로 설정하여 x 노드를 제거
+            prevNode.next = x.next;
+
+            // prevNode의 next가 null이면, tail 노드를 prevNode로 설정
+            if (prevNode.next == null) {
+                tail = prevNode;
+            }
+            x.data = null; // x의 data를 null로 설정
+            x.next = null; // x의 next를 null로 설정하여 x 노드를 초기화
+            size--; // 리스트의 크기(size)를 감소시키고, true를 반환
+            return true;
+        }
+    }
+
+    @Override
+    // search(index) 메소드를 호출하여 주어진 인덱스에 해당하는 노드를 찾은 후, 해당 노드의 데이터를 반환
+    public E get(int index) {
+        // search(index) 메소드는 이 리스트에서 주어진 인덱스에 해당하는 노드의 데이터를 반환하는 메소드
+        return search(index).data;
+    }
+
+    @Override
+    //  search(index) 메소드를 호출하여 주어진 인덱스에 해당하는 노드를 찾은 후, 해당 노드의 데이터를 새로운 값으로 변경
+    public void set(int index, E value) {
+        // replaceNode 변수에 search(index) 메소드의 반환값인 해당 노드를 저장
+        Node<E> replaceNode = search(index);
+        // replaceNode의 데이터 필드를 null로 설정
+        replaceNode.data = null;
+        // 새로운 값을 할당
+        replaceNode.data = value;
     }
 }
