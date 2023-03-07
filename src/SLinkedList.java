@@ -237,4 +237,27 @@ public class SLinkedList<E> implements List<E> {
         return indexOf(item) >= 0; // indexOf" 메소드를 호출하여 "item"이 리스트 내에 있는지 확인합니다.
         // 만약 "item"이 리스트 내에 존재하면 "indexOf"는 해당 요소의 인덱스를 반환하며, 그렇지 않으면 -1을 반환
     }
+    @Override
+    // 객체가 현재 가지고 있는 요소의 수를 반환
+    public int size() {
+        return size;
+    }
+    @Override
+    // 객체 내부에서 유지되는 "size"라는 변수를 확인하여 해당 값이 0이면 true를 반환하고, 0이 아니면 false를 반환
+    // 객체가 요소를 가지고 있지 않으면 true를 반환하며, 그렇지 않으면 false를 반환
+    public boolean isEmpty() {
+        return size == 0;
+    }
+    @Override
+    public void clear() {
+        // "head" 노드부터 시작하여 모든 노드를 순회하면서 각 노드의 "data"와 "next" 필드를 null로 설정하여 요소들을 제거
+        for (Node<E> x = head; x != null;) {
+            Node<E> nextNode = x.next;
+            x.data = null;
+            x.next = null;
+            x = nextNode;
+        }
+        head = tail = null; // "head"와 "tail" 노드를 모두 null로 설정하여 리스트의 끝을 표시
+        size = 0; // "size" 변수를 0으로 설정하여 요소의 개수를 0으로 초기화
+    }
 }
