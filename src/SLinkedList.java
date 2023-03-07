@@ -217,4 +217,24 @@ public class SLinkedList<E> implements List<E> {
         // 새로운 값을 할당
         replaceNode.data = value;
     }
+    @Override
+    // 매개변수로 전달된 값(value)과 같은 값을 가진 노드를 찾을 때까지 연결 리스트의 처음(head)부터 마지막 노드까지 반복문을 실행
+    public int indexOf(Object value) {
+        int index = 0;
+        // 노드 x가 null이 될 때까지 루프를 실행
+        for (Node<E> x = head; x != null; x = x.next) {
+            if (value.equals(x.data)) { // 데이터 값(x.data)과 매개변수로 전달된 값(value)이 같은 경우
+                return index; // 현재 노드의 인덱스(index)를 반환
+            }
+            index++;
+        }
+        // 해당 값을 가진 노드를 찾지 못한 경우, -1을 반환
+        return -1;
+    }
+    @Override
+    //  boolean 타입의 값을 반환, 매개변수는 Object 타입의 "item"
+    public boolean contains(Object item) {
+        return indexOf(item) >= 0; // indexOf" 메소드를 호출하여 "item"이 리스트 내에 있는지 확인합니다.
+        // 만약 "item"이 리스트 내에 존재하면 "indexOf"는 해당 요소의 인덱스를 반환하며, 그렇지 않으면 -1을 반환
+    }
 }
