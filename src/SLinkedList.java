@@ -1,8 +1,10 @@
 import Interface_form.List;
 
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.NoSuchElementException;
 
-public class SLinkedList<E> implements List<E> {
+public class SLinkedList<E> implements List<E>, Cloneable {
 
     private Node<E> head;    // head : 노드의 첫 부분을 나타내는 Node<E> 타입의 변수
     private Node<E> tail;    // tail : 노드의 마지막 부분을 나타내는 Node<E> 타입의 변수
@@ -217,6 +219,7 @@ public class SLinkedList<E> implements List<E> {
         // 새로운 값을 할당
         replaceNode.data = value;
     }
+
     @Override
     // 매개변수로 전달된 값(value)과 같은 값을 가진 노드를 찾을 때까지 연결 리스트의 처음(head)부터 마지막 노드까지 반복문을 실행
     public int indexOf(Object value) {
@@ -231,27 +234,31 @@ public class SLinkedList<E> implements List<E> {
         // 해당 값을 가진 노드를 찾지 못한 경우, -1을 반환
         return -1;
     }
+
     @Override
     //  boolean 타입의 값을 반환, 매개변수는 Object 타입의 "item"
     public boolean contains(Object item) {
         return indexOf(item) >= 0; // indexOf" 메소드를 호출하여 "item"이 리스트 내에 있는지 확인합니다.
         // 만약 "item"이 리스트 내에 존재하면 "indexOf"는 해당 요소의 인덱스를 반환하며, 그렇지 않으면 -1을 반환
     }
+
     @Override
     // 객체가 현재 가지고 있는 요소의 수를 반환
     public int size() {
         return size;
     }
+
     @Override
     // 객체 내부에서 유지되는 "size"라는 변수를 확인하여 해당 값이 0이면 true를 반환하고, 0이 아니면 false를 반환
     // 객체가 요소를 가지고 있지 않으면 true를 반환하며, 그렇지 않으면 false를 반환
     public boolean isEmpty() {
         return size == 0;
     }
+
     @Override
     public void clear() {
         // "head" 노드부터 시작하여 모든 노드를 순회하면서 각 노드의 "data"와 "next" 필드를 null로 설정하여 요소들을 제거
-        for (Node<E> x = head; x != null;) {
+        for (Node<E> x = head; x != null; ) {
             Node<E> nextNode = x.next;
             x.data = null;
             x.next = null;
@@ -259,5 +266,82 @@ public class SLinkedList<E> implements List<E> {
         }
         head = tail = null; // "head"와 "tail" 노드를 모두 null로 설정하여 리스트의 끝을 표시
         size = 0; // "size" 변수를 0으로 설정하여 요소의 개수를 0으로 초기화
+    }
+    public Object clone() throws CloneNotSupportedException {
+        // super.clone()을 호출하여 부모 클래스인 Object 클래스에서 제공하는 기본적인 복제 기능을 사용
+        // SLinkedList<? super E> 타입의 새로운 객체를 생성
+        //  "? super E"는 E 타입 또는 E의 상위 클래스를 의미합니다.
+        //  따라서, SLinkedList의 하위 클래스를 생성할 수 있습니다.
+        @SuppressWarnings("unchecked")
+        SLinkedList<? super E> clone = (SLinkedList<? super E>) super.clone();
+        // 복제된 객체의 head, tail, size 멤버 변수를 초기화
+        // 기존 객체와는 다른 새로운 객체를 만들기 위해 필요
+        clone.head = null;
+        clone.tail = null;
+        clone.size = 0;
+        // 원래 객체의 요소를 순회하면서 각 요소를 새로운 객체의 끝에 추가합니다(addLast 메서드를 호출)
+        for (Node<E> x = head; x != null; x = x.next) {
+            clone.addLast(x.data); // 복제된 객체는 원래 객체와 동일한 내용을 가지게 됩니다.
+        }
+
+        return clone; // 복제된 객체를 반환
+    }
+    // 리스트의 모든 요소를 Object[] 타입의 배열로 변환
+    public Object[] toArray() {
+        // 리스트의 크기와 같은 크기의 Object[] 타입의 배열을 생성
+        Object[] array = new Object[size];
+        int idx = 0;
+        // 리스트의 요소를 순회하면서 각 요소를 배열에 저장
+        for (Node<E> x = head; x != null; x = x.next) {
+            array[idx++] = (E) x.data; // 각 요소를 (E) x.data로 형변환하여 저장
+        }
+        return array; // 모든 요소가 저장된 배열을 반환
+    }
+    // 리스트의 모든 요소를 입력된 배열 a에 저장하고,
+    // 만약 a 배열의 크기가 리스트의 크기보다 작으면 새로운 배열을 생성하여 저장
+    @SuppressWarnings("unchecked")
+    public <T> T[] toArray(T[] a) {
+        // 입력된 배열 a의 크기가 리스트의 크기보다 작은 경우, a와 같은 컴포넌트 타입을 가지며 크기가 size인 새로운 배열을 생성합니다.
+        // 이때, java.lang.reflect.Array.newInstance(컴포넌트 타입, 생성할 크기) 메서드를 사용
+        if (a.length < size) {
+            a = (T[]) java.lang.reflect.Array.newInstance(a.getClass().getComponentType(), size);
+        }
+        int i = 0;
+        Object[] result = a; // 리스트의 요소를 순회하면서 각 요소를 배열 a에 저장
+        // result 변수에 입력된 배열 a를 저장
+        // 요소를 저장할 때는 형변환 없이 저장
+        for (Node<E> x = head; x != null; x = x.next) {
+            result[i++] = x.data;
+        }
+        return a; // 입력된 배열 a를 반환
+    }
+    /*
+    toArray(T[] a) 메서드는 입력된 배열 a를 이용하여 리스트의 요소를 저장할 수 있고,
+    메모리를 효율적으로 관리할 수 있습니다.
+    또한, 제네릭 메서드로 구현되어 있어 다양한 타입의 배열에도 적용할 수 있습니다.
+     */
+
+    // 리스트의 요소를 기본적인 Comparable에 의해 정렬
+    public void sort() {
+        /*
+        내부적으로 sort(null)을 호출하여 Comparable에 의해 요소를 정렬합니다.
+        이때, 만약 해당 객체가 Comparable을 구현하지 않은 경우 ClassCastException이 발생
+         */
+        sort(null);
+    }
+    // Comparator를 이용하여 리스트의 요소를 정렬
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public void sort(Comparator<? super E> c) {
+        Object[] a = this.toArray(); // toArray() 메서드를 이용하여 리스트의 요소를 배열로 변환
+        Arrays.sort(a, (Comparator) c); // 배열을 정렬합니다.
+        // 이때, Comparator 객체를 사용하여 요소의 정렬 방식을 결정
+        //  만약 c가 null인 경우에는 객체의 Comparable에 구현된 정렬 방식을 사용
+
+        int i = 0;
+        // 정렬된 배열 a를 이용하여 리스트의 요소를 다시 저장합니다.
+        // 이때, 배열의 i번째 요소를 리스트의 i번째 요소와 대응시키면서 요소를 저장
+        for (Node<E> x = head; x != null; x = x.next, i++) {
+            x.data = (E) a[i];
+        }
     }
 }
